@@ -20,7 +20,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
     private final PdfService pdfService;
 
-    // ✅ CHECK-IN (NO userId)
+    // ✅ CHECK-IN
     @PostMapping("/check-in")
     public String checkIn(HttpServletRequest request) {
 
@@ -28,7 +28,7 @@ public class AttendanceController {
         String ip = request.getRemoteAddr();
 
         if (email == null) {
-            throw new RuntimeException("Unauthorized: No user found in token");
+            throw new RuntimeException("Unauthorized");
         }
 
         return attendanceService.checkIn(email, ip);
@@ -40,43 +40,50 @@ public class AttendanceController {
 
         String email = (String) request.getAttribute("userEmail");
 
+        if (email == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
         return attendanceService.checkOut(email);
     }
 
+    // ✅ GET ALL (TEMP: NO ADMIN CHECK)
     @GetMapping("/all")
     public List<Attendance> getAllAttendance(HttpServletRequest request) {
 
-        String role = (String) request.getAttribute("userRole");
+        String email = (String) request.getAttribute("userEmail");
 
-        if (!"ADMIN".equals(role)) {
-            throw new RuntimeException("Access Denied: Only ADMIN");
+        if (email == null) {
+            throw new RuntimeException("Unauthorized");
         }
 
         return attendanceService.getAllAttendance();
     }
 
+    // ✅ PDF DOWNLOAD (TEMP: NO ADMIN CHECK)
     @GetMapping("/pdf")
     public void downloadPdf(HttpServletRequest request,
                             HttpServletResponse response) {
 
-        String role = (String) request.getAttribute("userRole");
+        String email = (String) request.getAttribute("userEmail");
 
-        if (!"ADMIN".equals(role)) {
-            throw new RuntimeException("Access Denied: Only ADMIN");
+        if (email == null) {
+            throw new RuntimeException("Unauthorized");
         }
 
         pdfService.generateAttendancePdf(response);
     }
 
+    // ✅ PDF BY DATE
     @GetMapping("/pdf/{date}")
-    public void downloadPdfByDate(@PathVariable String date,   // ✅ CORRECT
+    public void downloadPdfByDate(@PathVariable String date,
                                   HttpServletRequest request,
                                   HttpServletResponse response) {
 
-        String role = (String) request.getAttribute("userRole");
+        String email = (String) request.getAttribute("userEmail");
 
-        if (!"ADMIN".equals(role)) {
-            throw new RuntimeException("Access Denied: Only ADMIN");
+        if (email == null) {
+            throw new RuntimeException("Unauthorized");
         }
 
         LocalDate localDate = LocalDate.parse(date);
@@ -84,14 +91,15 @@ public class AttendanceController {
         pdfService.generateAttendancePdfByDate(response, localDate);
     }
 
+    // ✅ DASHBOARD (TEMP: NO ADMIN CHECK)
     @GetMapping("/dashboard")
     public DashboardResponse getDashboard(@RequestParam String date,
                                           HttpServletRequest request) {
 
-        String role = (String) request.getAttribute("userRole");
+        String email = (String) request.getAttribute("userEmail");
 
-        if (!"ADMIN".equals(role)) {
-            throw new RuntimeException("Access Denied: Only ADMIN");
+        if (email == null) {
+            throw new RuntimeException("Unauthorized");
         }
 
         LocalDate localDate = LocalDate.parse(date);
