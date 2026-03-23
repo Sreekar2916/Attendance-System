@@ -48,7 +48,7 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new CustomException("Already checked in");
         }
 
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Kolkata"));
 
         // ⏱ Late detection
         LocalTime officeTime = LocalTime.of(9, 30);
@@ -74,7 +74,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .findByUserIdAndCheckOutIsNull(user.getId())
                 .orElseThrow(() -> new CustomException("No active check-in"));
 
-        attendance.setCheckOut(LocalDateTime.now());
+        attendance.setCheckOut(LocalDateTime.now(ZoneId.of("Asia/Kolkata")));
 
         attendanceRepository.save(attendance);
 

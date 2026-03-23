@@ -1,5 +1,6 @@
 package com.company.attendance.controller;
 
+import com.company.attendance.dto.response.AttendanceDto;
 import com.company.attendance.dto.response.DashboardResponse;
 import com.company.attendance.entity.Attendance;
 import com.company.attendance.service.AttendanceService;
@@ -49,7 +50,7 @@ public class AttendanceController {
 
     // ✅ GET ALL (TEMP: NO ADMIN CHECK)
     @GetMapping("/all")
-    public List<Attendance> getAllAttendance(HttpServletRequest request) {
+    public List<AttendanceDto> getAllAttendance(HttpServletRequest request) {
 
         String email = (String) request.getAttribute("userEmail");
 
@@ -57,7 +58,18 @@ public class AttendanceController {
             throw new RuntimeException("Unauthorized");
         }
 
-        return attendanceService.getAllAttendance();
+        return attendanceService.getAllAttendance()
+                .stream()
+                .map(a -> {
+                    AttendanceDto res = new AttendanceDto();
+                    res.setId(a.getId());
+                    res.setUserId(a.getUserId());
+                    res.setCheckIn(a.getCheckIn());
+                    res.setCheckOut(a.getCheckOut());
+                    res.setStatus(a.getStatus());
+                    return res;
+                })
+                .toList();
     }
 
     // ✅ PDF DOWNLOAD (TEMP: NO ADMIN CHECK)
