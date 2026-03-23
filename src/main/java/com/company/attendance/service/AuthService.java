@@ -6,4 +6,6 @@ import com.company.attendance.dto.response.LoginResponse;
 public interface AuthService {
 
     LoginResponse login(LoginRequest request);
+
+    void register(LoginRequest request);
 }

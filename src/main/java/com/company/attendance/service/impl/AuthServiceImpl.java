@@ -17,6 +17,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
+    // 🔐 LOGIN
     @Override
     public LoginResponse login(LoginRequest request) {
 
@@ -27,7 +28,7 @@ public class AuthServiceImpl implements AuthService {
             throw new CustomException("Invalid password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(),user.getRole());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
 
         LoginResponse response = new LoginResponse();
         response.setId(user.getId());
@@ -36,5 +37,26 @@ public class AuthServiceImpl implements AuthService {
         response.setToken(token);
 
         return response;
+    }
+
+    // 🆕 REGISTER
+    @Override
+    public void register(LoginRequest request) {
+
+        // check if user already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new CustomException("User already exists");
+        }
+
+        // create new user
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword()); // ⚠️ plain text (ok for now)
+
+        // set defaults (IMPORTANT)
+        user.setName(request.getEmail()); // or add name field in request later
+        user.setRole("USER"); // default role
+
+        userRepository.save(user);
     }
 }
