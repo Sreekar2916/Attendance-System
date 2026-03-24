@@ -22,11 +22,11 @@ public class JwtFilter implements Filter {
 
         String path = req.getRequestURI();
 
-        if (path.contains("/api/auth") ||
-                path.contains("/swagger-ui") ||
-                path.contains("/v3/api-docs") ||
-                path.contains("/swagger-resources") ||
-                path.contains("/webjars")) {
+        if (path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/swagger-resources") ||
+                path.startsWith("/webjars") ||
+                path.startsWith("/api/auth")) {
 
             chain.doFilter(request, response);
             return;
@@ -35,8 +35,7 @@ public class JwtFilter implements Filter {
         String header = req.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("Missing or invalid Authorization header");
+            chain.doFilter(request, response);
             return;
         }
 
