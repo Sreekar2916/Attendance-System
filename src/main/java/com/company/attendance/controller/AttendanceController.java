@@ -74,8 +74,8 @@ public class AttendanceController {
 
     // ✅ PDF DOWNLOAD (TEMP: NO ADMIN CHECK)
     @GetMapping("/pdf")
-    public void downloadPdf(HttpServletRequest request,
-                            HttpServletResponse response) {
+    public String downloadPdf(HttpServletRequest request,
+                              HttpServletResponse response) {
 
         String email = (String) request.getAttribute("userEmail");
 
@@ -84,13 +84,14 @@ public class AttendanceController {
         }
 
         pdfService.generateAttendancePdf(response);
+        return "PDF generated";
     }
 
     // ✅ PDF BY DATE
     @GetMapping("/pdf/{date}")
-    public void downloadPdfByDate(@PathVariable String date,
-                                  HttpServletRequest request,
-                                  HttpServletResponse response) {
+    public String downloadPdfByDate(@PathVariable String date,
+                                    HttpServletRequest request,
+                                    HttpServletResponse response) {
 
         String email = (String) request.getAttribute("userEmail");
 
@@ -101,6 +102,7 @@ public class AttendanceController {
         LocalDate localDate = LocalDate.parse(date);
 
         pdfService.generateAttendancePdfByDate(response, localDate);
+        return "PDF generated";
     }
 
     // ✅ DASHBOARD (TEMP: NO ADMIN CHECK)
