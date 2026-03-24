@@ -22,8 +22,12 @@ public class JwtFilter implements Filter {
 
         String path = req.getRequestURI();
 
-        // ✅ Skip authentication for login API
-        if (path.contains("/api/auth/login")) {
+        if (path.contains("/api/auth") ||
+                path.contains("/swagger-ui") ||
+                path.contains("/v3/api-docs") ||
+                path.contains("/swagger-resources") ||
+                path.contains("/webjars")) {
+
             chain.doFilter(request, response);
             return;
         }
