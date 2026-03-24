@@ -22,6 +22,7 @@ public class JwtFilter implements Filter {
 
         String path = req.getRequestURI();
 
+        //  Allow Swagger + Auth APIs
         if (path.startsWith("/v3/api-docs") ||
                 path.startsWith("/swagger-ui") ||
                 path.startsWith("/swagger-resources") ||
@@ -32,25 +33,27 @@ public class JwtFilter implements Filter {
             return;
         }
 
-        String header = req.getHeader("Authorization");
-
-        if (header == null || !header.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String token = header.substring(7);
-
         try {
+            String header = req.getHeader("Authorization");
+
+            //  If no token → just continue (DON'T throw error)
+            if (header == null || !header.startsWith("Bearer ")) {
+                chain.doFilter(request, response);
+                return;
+            }
+
+            String token = header.substring(7);
+
             String email = jwtUtil.extractEmail(token);
             String role = jwtUtil.extractRole(token);
 
+            //  Store in request
             req.setAttribute("userEmail", email);
             req.setAttribute("userRole", role);
 
         } catch (Exception e) {
-            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            res.getWriter().write("Invalid or expired token");
+            // VERY IMPORTANT → never crash Swagger
+            chain.doFilter(request, response);
             return;
         }
 
