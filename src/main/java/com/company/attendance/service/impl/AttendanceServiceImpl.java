@@ -25,8 +25,17 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     // 🔐 WIFI VALIDATION
     private boolean isValidOfficeIp(String ip) {
-        return ip.startsWith("192.168.0.")  // your WiFi network
-                || ip.equals("127.0.0.1");  // local testing
+
+        // Allow local WiFi
+        if (ip.startsWith("192.168.0.")) return true;
+
+        // Allow localhost
+        if (ip.equals("127.0.0.1")) return true;
+
+        // Allow cloud/proxy (Render)
+        if (ip.startsWith("10.") || ip.startsWith("172.")) return true;
+
+        return false;
     }
 
     @Override
