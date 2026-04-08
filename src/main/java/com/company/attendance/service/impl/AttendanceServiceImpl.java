@@ -25,9 +25,7 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     // 🔐 WIFI VALIDATION
     private boolean isValidOfficeIp(String ip) {
-        return ip.startsWith("192.168.")
-                || ip.startsWith("10.")
-                || ip.startsWith("172.")
+        return ip.startsWith("192.168.0.")
                 || ip.equals("127.0.0.1");
     }
 
